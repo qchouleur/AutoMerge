@@ -9,6 +9,10 @@
 		The Git-AutoMerge function merge the branch source into the destination branch
 		only if the merge is fast-forward. It pushes the resulting commit if the merge succeed.
 		Otherwise it aborts the merge to restore a clean state.
+	
+	.PARAMETER remote
+
+		The name of the remote repository
 
 	.PARAMETER source
 
@@ -20,9 +24,9 @@
 
 	.EXAMPLE 
 
-		Merges the Story123 branch into the dev branch.
+		Merges the Story123 branch into the dev branch and pushes the result onto the origin distant repository.
 
-		Git-AutoMerge Story123 dev
+		Git-AutoMerge origin Story123 dev
 
 	.NOTES
 
@@ -32,8 +36,7 @@
 			- The remote origin exists
 
 #>
-
-function Git-AutoMerge([string]$source, [string]$destination)
+function Git-AutoMerge([string]$remote, [string]$source, [string]$destination)
 { 
 	function Git-Checkout([string]$branch) { 
 		$currentBranch = git rev-parse --abbrev-ref HEAD
@@ -44,12 +47,12 @@ function Git-AutoMerge([string]$source, [string]$destination)
 
     Git-Checkout($destination)
 
-	git pull
-    git merge origin/$source
+	git pull $remote $destination
+    git merge $remote/$source
 
     if($LASTEXITCODE -eq 0) 
     { 
-        git push origin $destination
+        git push $remote $destination
     } 
     elseif($LASTEXITCODE -eq 1) 
     { 
